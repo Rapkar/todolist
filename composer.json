@@ -1,0 +1,16 @@
+{
+    "name": "hossein-hp/todo",
+    "description": "A simple Todo List Project(With Ajax,Php , Mysql)",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "hossein soltanian",
+            "email": "hosseinbidar7@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "hekmatinasser/verta": "^1.10"
+    }
+}

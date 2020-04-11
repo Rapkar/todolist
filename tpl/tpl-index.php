@@ -1,10 +1,12 @@
+<?php
+echo implode('-',$tasks).rand(0,9999);
+?>
 <!DOCTYPE html>
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>CodePen - Task manager UI</title>
-  <link rel="stylesheet" href="./style.css">
-
+  <title><?= SITE_TITLE ?></title>
+  <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
 </head>
 <body>
 <!-- partial:index.partial.html -->

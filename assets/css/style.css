@@ -11,7 +11,16 @@ body {
   font-size: 14px;
   font-smoothing: antialiased;
 }
-
+input{
+  padding: 3px 10px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+.btn{
+  padding: 3px 10px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
 .page {
   position: absolute;
   width: 80%;
@@ -120,6 +129,23 @@ body {
 .main .nav .menu ul {
   padding-left: 0px;
 }
+.main .nav .menu ul li a {
+  text-decoration: none;
+  color: #136B7C;
+}
+.main .nav .menu ul li a .active {
+  text-decoration: none;
+  color: #79BC46;
+}
+ .remove{
+   float: right;
+  color: #f75858 !important;
+  padding-right: 10px;
+  }
+  a.remove:hover{
+    font-weight: bold;
+    border-bottom: 1px blueviolet;
+  }
 .main .nav .menu ul li {
   cursor: pointer;
   list-style: none;
@@ -266,4 +292,12 @@ body {
 
 .clear {
   clear: both;
+}
+.clickable:hover{
+  cursor: pointer;
+  border: 1px solid #555;
+}
+span.created_at{
+  font-size: 12px;
+  margin-right: 25px;
 }

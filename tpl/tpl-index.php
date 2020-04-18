@@ -1,6 +1,4 @@
-<?php
-echo implode('-',$tasks).rand(0,9999);
-?>
+<?php defined('BASE_PATH') or die('NO PERMISION'); ?>
 <!DOCTYPE html>
 <html lang="en" >
 <head>
@@ -13,28 +11,48 @@ echo implode('-',$tasks).rand(0,9999);
 <div class="page">
   <div class="pageHeader">
     <div class="title">Dashboard</div>
-    <div class="userPanel"><i class="fa fa-chevron-down"></i><span class="username">John Doe </span><img src="https://s3.amazonaws.com/uifaces/faces/twitter/kolage/73.jpg" width="40" height="40"/></div>
+    <div class="userPanel">
+      <a href="?signout=1"><i style="cursor: pointer;text-decoration:none;color: wheat;" class="fa fa-sign-out"> </i></a>
+      <span class="username"><?= $userloggin->name; ?> </span>
+   <img src="<?= $userloggin->image ?>" width="40" height="40"/></div>
   </div>
   <div class="main">
     <div class="nav">
       <div class="searchbox">
         <div><i class="fa fa-search"></i>
-          <input type="search" placeholder="Search"/>
+          <input id="search" type="search" placeholder="Search"/>
         </div>
       </div>
       <div class="menu">
-        <div class="title">Navigation</div>
-        <ul>
-          <li> <i class="fa fa-home"></i>Home</li>
-          <li><i class="fa fa-signal"></i>Activity</li>
-          <li class="active"> <i class="fa fa-tasks"></i>Manage Tasks</li>
-          <li> <i class="fa fa-envelope"></i>Messages</li>
+        <div class="title">Folders</div>
+        <ul id="ullis">
+              
+        <li class="<?=isset($_GET['folder_id']) ? 'active' : '' ?>">
+        <a href="<?= site_url(); ?>">
+         <i class="fa fa-folder active"></i>allTasks
+        </a>
+        </li>
+          <?php foreach ($folders as $folder) :?>
+           <li class="">
+              <a href="<?= site_url("?folder_id= $folder->id")?>">
+              <i class="fa fa-folder <?= ($_GET['folder_id']==$folder->id) ? 'active': '' ?>"></i><?=$folder->name ?>
+            </a>
+            <a href="<?= site_url("?delete_folder= $folder->id") ?>" class="remove" onclick="return confirm('Are you sure Deleted this task?\n<?=$folder->name ?>');">X</a>
+            </li>
+          <?php endforeach; ?> 
+      
         </ul>
+      </div>
+      <div>
+      <input type="text" id="addFolderInput" placeholder="add new folder">
+      <button class="btn clickable" id="addFolderBtn">+</button>
       </div>
     </div>
     <div class="view">
       <div class="viewHeader">
-        <div class="title">Manage Tasks</div>
+        <div class="title">
+        <input type="text" id="addTaskName" placeholder="add new Task" style="line-height: 3;width: 580px;border-left: 3px solid #54b9cd;">
+        </div>
         <div class="functions">
           <div class="button active">Add New Task</div>
           <div class="button">Completed</div>
@@ -43,22 +61,28 @@ echo implode('-',$tasks).rand(0,9999);
       </div>
       <div class="content">
         <div class="list">
-          <div class="title">Today</div>
-          <ul>
-            <li class="checked"><i class="fa fa-check-square-o"></i><span>Update team page</span>
+          <div class="title">Today
+          <i class="fa fa-sort" style="margin-left: 20px;cursor:pointer;"></i>
+          </div>
+          <ul id="tasksul">
+            <?php if(sizeof($tasks)>0):?>
+          <?php foreach ($tasks as $task) :?>
+            <li class="<?=$task->id_done ? 'checked':''; ?>">
+            <i  data-taskid="<?=$task->id ?>" class="isdone fa <?=$task->id_done ? 'fa-check-square-o' : 'fa-square-o'; ?>">
+            </i><span><?=$task->title;?></span>
               <div class="info">
-                <div class="button green">In progress</div><span>Complete by 25/04/2014</span>
+                <span class="created_at">Created at:<?=$task->created_at?></span>
+                <a href="?delete_task=<?= $task->id ?>" class="remove" onclick="return confirm('Are you sure Deleted this task?\n<?=$task->title;?>');">X</a>
               </div>
             </li>
-            <li><i class="fa fa-square-o"></i><span>Design a new logo</span>
-              <div class="info">
-                <div class="button">Pending</div><span>Complete by 10/04/2014</span>
-              </div>
-            </li>
-            <li><i class="fa fa-square-o"></i><span>Find a front end developer</span>
+          <?php endforeach; ?>
+          <?php
+          else: ?>
+          <li><span>This folder Not Exist Task</span>
               <div class="info"></div>
             </li>
-          </ul>
+          <?php endif; ?>
+          <!-- </ul>
         </div>
         <div class="list">
           <div class="title">Tomorrow</div>
@@ -66,7 +90,7 @@ echo implode('-',$tasks).rand(0,9999);
             <li><i class="fa fa-square-o"></i><span>Find front end developer</span>
               <div class="info"></div>
             </li>
-          </ul>
+          </ul> -->
         </div>
       </div>
     </div>
@@ -74,6 +98,80 @@ echo implode('-',$tasks).rand(0,9999);
 </div>
 <!-- partial -->
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script><script  src="./script.js"></script>
-
+<script>
+  $(document).ready(function(){
+    $('.isdone').click(function(e){
+      var taskid=$(this).attr('data-taskid');
+      $.ajax({
+        url:"process/Ajax_handler.php",
+        method:'post',
+        data:{action:'task_isdone',task_isdon:taskid},
+        success:function(resp){
+              location.reload();
+        }
+        
+      })
+    });
+    $("#addFolderBtn").click(function(event){
+      var input=$("#addFolderInput").val();
+    
+      $.ajax({
+          url:"process/Ajax_handler.php",
+          method:"post",
+          data:{action:"addFolder",folderName:input},
+          success:function(response){
+            var Folderobj=jQuery.parseJSON(response);
+         $('<li><i class="fa fa-folder active"></i>'+ Folderobj.folderName +'</li>').appendTo('#ullis');
+         location.reload();
+          }
+      });
+    });
+    $("#addTaskName").on('keypress',function(e) {
+    if(e.which == 13) {
+      $.ajax({
+          url:"process/Ajax_handler.php",
+          method:"post",
+          data:{action:"addTask",task_title:$("#addTaskName").val(),folder_id:"<?= $_GET['folder_id'] ??''; ?>"},
+          success:function(response){
+           if(response=='1'){
+         
+              location.reload(); 
+           }else{
+            alert(response);
+           }
+          }
+      });
+    }
+    });
+    $("#search").on('keypress',function(e) {
+      var inp=$(this).val();
+    if(e.which == 13) {
+      $.ajax({
+        url:"process/Ajax_handler.php",
+          method:"post",
+          data:{action:"search",text_search:inp},
+          success:function(response){
+            var objSearch=jQuery.parseJSON(response);
+            if(objSearch===null){
+              $("#tasksul").empty();
+              $('<li><span>Not found Task Whith this txt</span>').appendTo('#tasksul');
+            }
+            else
+            {
+         
+            $("#tasksul").empty();
+            $.each( objSearch, function( key, value ) {
+              $('<li> <i class="isdone"></i><span>'+objSearch[key].title+'</span><div class="info"> <span class="created_at">'+objSearch[key].created_at+'</span> </div></li>').appendTo('#tasksul');
+            });
+            
+            
+           }
+        }
+      });
+      
+     }
+    });
+  });
+</script>
 </body>
 </html>

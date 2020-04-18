@@ -1,8 +1,11 @@
 <?php
 
-$database_config=[
-    'host'=>'',
-    'user'=>'',
+$database_config=(object)[
+    'host'=>'localhost',
+    'user'=>'root',
     'pass'=>'',
-    'db'=>''
+    'db'=>'7todo'
+];
+$task_sort=(object)[
+    'Sort'=>'DESC'
 ];

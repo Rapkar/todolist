@@ -6,6 +6,5 @@ $database_config=(object)[
     'pass'=>'',
     'db'=>'7todo'
 ];
-$task_sort=(object)[
-    'Sort'=>'DESC'
-];
+$task_sort=(object)[ 'Sort'=>'DESC'];
+$post_per_page=(object)[ 'count'=>'8'];

@@ -5,6 +5,25 @@
   <meta charset="UTF-8">
   <title><?= SITE_TITLE ?></title>
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
+  <style>
+.pagination {
+  display: inline-block;
+  margin-left: 30%;
+}
+
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+.hide{
+  display: none;
+}
+.show{
+  display: block;
+}
+</style>
 </head>
 <body>
 <!-- partial:index.partial.html -->
@@ -29,7 +48,7 @@
               
         <li class="<?=isset($_GET['folder_id']) ? 'active' : '' ?>">
         <a href="<?= site_url(); ?>">
-         <i class="fa fa-folder active"></i>allTasks
+         <i style="cursor: pointer;" class="fa fa-folder active"></i>allTasks
         </a>
         </li>
           <?php foreach ($folders as $folder) :?>
@@ -65,6 +84,7 @@
           <i class="fa fa-sort" style="margin-left: 20px;cursor:pointer;"></i>
           </div>
           <ul id="tasksul">
+          <?php if($tasks != null) : ?>
             <?php if(sizeof($tasks)>0):?>
           <?php foreach ($tasks as $task) :?>
             <li class="<?=$task->id_done ? 'checked':''; ?>">
@@ -82,6 +102,7 @@
               <div class="info"></div>
             </li>
           <?php endif; ?>
+          <?php endif; ?>
           <!-- </ul>
         </div>
         <div class="list">
@@ -91,6 +112,14 @@
               <div class="info"></div>
             </li>
           </ul> -->
+          <?php if($lim !=" LIMIT 0,0"):  ?>
+          <div class="pagination">
+          <a href="?pageno=1">First</a>
+          <a class="<?= ($pageno<= 1) ? "hide" : "Show" ?>" href="<?= ($pageno<=1) ? "#" : "?pageno=".($pageno - 1); ?>">Prev</a>
+          <a class="<?= ($pageno >= $totalPagination['totalpages']) ? "hide" : "Show" ?>" href="<?= ($pageno >=$totalPagination['totalpages']) ? '#' : "?pageno=".($pageno + 1); ?>">Next</a>
+          <a  href="?pageno=<?= $totalPagination['totalpages']; ?>">Last</a>
+          </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ function deleteFolder($folder_id){
     $stmt->execute();
     return $stmt->rowCount();
 }
+
 function getFolders(){
     global $pdo;
     $current_user_id=getCurrentUserId();
@@ -30,25 +31,30 @@ function addFolder($folder_name){
     $stmt->execute([':foldername'=>$folder_name,':user_id'=>$current_user_id]);
     return $stmt->rowCount();
 }
-function getTasks($var=""){
-    global $pdo;
-    global $task_sort;
-    $current_user_id=getCurrentUserId();
-    $folder=$_GET['folder_id'] ?? null;
-    $folder_condition="";
-    $sort="ORDER BY created_at ".$task_sort->Sort; 
-    if(isset($folder) and is_numeric($folder)){
-        $folder_condition="AND folder_id=$folder";
-    }     
-    $var_search="AND title LIKE "."'%".$var."%'";
-    $sql="SELECT * FROM tasks WHERE user_id=$current_user_id $var_search  $folder_condition $sort";
-    $stmt=$pdo->prepare($sql);
-    $stmt->execute();
-    $records=$stmt->fetchAll(PDO::FETCH_OBJ);
-    if(empty($records)){
-        return null;
+function getTasks($var="",$limit=" "){
+    try{
+        global $pdo;
+        global $task_sort;
+        $current_user_id=getCurrentUserId();
+        $folder=$_GET['folder_id'] ?? null;
+        $folder_condition="";
+        $sort="ORDER BY created_at ".$task_sort->Sort; 
+        
+        if(isset($folder) and is_numeric($folder)){
+            $folder_condition="AND folder_id=$folder";
+        }     
+        $var_search="AND title LIKE "."'%".$var."%'";
+        $sql="SELECT * FROM tasks WHERE user_id=$current_user_id $var_search  $folder_condition $sort $limit";
+        $stmt=$pdo->prepare($sql);
+        $stmt->execute();
+        $records=$stmt->fetchAll(PDO::FETCH_OBJ);
+        if(empty($records)){
+            return null;
+        }
+        return $records;
+    }catch(PDOException $e){
+        return "Sorry : ".$e;
     }
-    return $records;
 }
 function deleteTask($task_id){
     global $pdo;
@@ -74,4 +80,29 @@ function taskIsDone($task_id){
 
     return $stmt->rowCount();
 
+}
+function totalPagination($var="",$pageno="1"){
+    global $pdo;
+    global $task_sort;
+    global $post_per_page;
+    $per_page=$post_per_page->count;
+    $current_user_id=getCurrentUserId();
+    $folder=$_GET['folder_id'] ?? null;
+    $folder_condition="";
+    $sort="ORDER BY created_at ".$task_sort->Sort; 
+    if(isset($folder) and is_numeric($folder)){
+        $folder_condition="AND folder_id=$folder";
+    }     
+    $var_search="AND title LIKE "."'%".$var."%'";
+    $sql="SELECT Count(*)  FROM tasks WHERE user_id=$current_user_id $var_search  $folder_condition $sort";
+    $stmt=$pdo->prepare($sql);
+    $stmt->execute();
+    $records=$stmt->fetch()[0];
+    $offset = ($pageno - 1) * $per_page; 
+    $total_pages = ceil($records / $per_page);
+    if(empty($total_pages) || is_null($offset)){
+        return  null;
+    }
+    $res=array('totalpages'=>$total_pages,'offset'=>$offset,'records'=>$records,'per_page'=>$per_page);
+    return $res;
 }
